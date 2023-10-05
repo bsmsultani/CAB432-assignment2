@@ -8,7 +8,6 @@ To get started, you'll need to do the following:
 
 `git clone https://github.com/bsmsultani/CAB432-assignment2.git`
 
-
 2. Install any dependencies required by the project using the following command:
 
 ``npm install .`
