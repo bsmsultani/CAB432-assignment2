@@ -1,58 +1,14 @@
-/* Style for the Video Drop Box */
 .video-drop-box {
-  border: 2px dashed #ccc;
-  padding: 20px;
-  text-align: center;
-  background-color: #f9f9f9;
-  color: #333;
-  transition: border-color 0.3s ease-in-out;
-  cursor: pointer; /* Add cursor style to indicate it's clickable */
-  width: 20%;
-  height: 30%;
+    padding: 5%;
+    text-align: center;
 }
 
-.video-drop-box.dragging {
-  border-color: #007bff;
-  background-color: #e6f7ff;
-  color: #007bff;
+
+.upload-video {
+    padding: inherit;
 }
 
-/* Style for the "Browse File" button */
-.browse-button {
-  display: inline-block;
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
-  margin-top: 10px;
-}
+* {
+    border: 1px solid black;
 
-.browse-button:hover {
-  background-color: #0056b3;
-}
-
-/* Hide the default file input */
-input[type="file"] {
-  display: none;
-}
-
-/* Style the label to look like a button */
-label.browse-button {
-  display: inline-block;
-  background-color: #007bff;
-  color: #fff;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease-in-out;
-  margin-top: 10px;
-  text-align: center;
-}
-
-label.browse-button:hover {
-  background-color: #0056b3;
 }

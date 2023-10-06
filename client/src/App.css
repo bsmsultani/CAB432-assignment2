@@ -1,6 +1,0 @@
-.video-drop-box {
-  position: absolute; /* Position the VideoDropBox element relative to the container */
-  top: 50%; /* Adjust the top position as needed */
-  left: 50%; /* Adjust the left position as needed */
-  transform: translate(-50%, -50%); /* Center the VideoDropBox element */
-}

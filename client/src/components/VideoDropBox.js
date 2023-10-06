@@ -1,118 +1,53 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from "react";
 import './videoDropBox.css';
 
 const VideoDropBox = () => {
-  const [dragging, setDragging] = useState(false);
-  const [videoURL, setVideoURL] = useState(null);
-  const videoRef = useRef(null);
+  // Create a ref to store the file input element
+  // a ref is a way to access a DOM element in React
+  // the video file is stored in the ref
 
-  const handleDragEnter = (e) => {
+  const videoFile = useRef(null);
+  const SERVER = localStorage.getItem('server');
+  const UPLOAD_URL = `${SERVER}/api/video/upload`;
+
+  // Function to handle form submission
+  // NEED TO ADD ERROR HANDLING SUCH AS IF NO FILE IS SELECTED
+  // IF THE SERVER IS DOWN, ETC.
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setDragging(true);
-  };
+    
+    // Create a FormData object to store the selected video file
+    const formData = new FormData();
+    formData.append('video', videoFile.current.files[0]);
 
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    setDragging(false);
-
-    // Handle the dropped video here
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles.length > 0) {
-      const videoFile = droppedFiles[0];
-
-      // Display the video preview
-      const videoObjectURL = URL.createObjectURL(videoFile);
-      setVideoURL(videoObjectURL);
-
-      // Update the video element source
-      if (videoRef.current) {
-        videoRef.current.src = videoObjectURL;
-      }
-    }
-  };
-
-  const handleFileInputChange = (e) => {
-    // Handle the selected file when the user chooses a file using the "Browse" button
-    const selectedFile = e.target.files[0];
-    if (selectedFile) {
-      // Display the video preview
-      const videoObjectURL = URL.createObjectURL(selectedFile);
-      setVideoURL(videoObjectURL);
-
-      // Update the video element source
-      if (videoRef.current) {
-        videoRef.current.src = videoObjectURL;
-      }
-    }
-  };
-
-  const handleUploadClick = () => {
-    // Handle the upload logic here
-    if (videoURL) {
-      // You can send the video file to your server for further processing
-      // Example: fetch('/uploadVideo', { method: 'POST', body: videoFile });
-
-      // Reset the component after upload (clear the video preview)
-      setVideoURL(null);
-      if (videoRef.current) {
-        videoRef.current.src = '';
-      }
-    }
-  };
+    fetch(UPLOAD_URL, {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      alert(data);
+    })
+    .catch(err => {
+      console.log(err);
+      alert(`Error uploading video, ${err}`);
+    });
+  }
 
   return (
-    <div>
-      <div
-        className={`video-drop-box ${dragging ? 'dragging' : ''}`}
-        onDragEnter={handleDragEnter}
-        onDragLeave={handleDragLeave}
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-      >
-        {videoURL ? (
-          <video ref={videoRef} controls width="100%">
-            <source src={videoURL} type="video/mp4" />
-            Your browser does not support the video tag.
-          </video>
-        ) : (
-          <p>{dragging ? 'Drop the video here' : 'Drag and drop a video here'}</p>
-        )}
-
-        <br />
-
-        {videoURL ? (
-          <div>
-            <label htmlFor="fileInput" className="browse-button">
-              Browse File
-            </label>
-            <button onClick={handleUploadClick} className="upload-button">
-              Upload
-            </button>
-          </div>
-        ) : (
-          <label htmlFor="fileInput" className="browse-button">
-            Browse File
-          </label>
-        )}
-      </div>
-
-      <input
-        type="file"
-        accept="video/*"
-        style={{ display: 'none' }}
-        onChange={handleFileInputChange}
-        id="fileInput"
-      />
+    <div className="video-drop-box">
+      <form onSubmit={handleSubmit} className="upload-video">
+        <input 
+          type='file' 
+          name='video' 
+          accept="video/*" 
+          ref={videoFile}
+        />
+        <input type="submit" value="Upload" />
+      </form>
     </div>
   );
-};
+}
 
 export default VideoDropBox;
