@@ -10,7 +10,7 @@ To get started, you'll need to do the following:
 
 2. Install any dependencies required by the project using the following command:
 
-``npm install .`
+`npm install .`
 
 3. Create a branch `git branch [name-of-the-branch]`
 
