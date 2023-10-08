@@ -1,4 +1,7 @@
 import express from 'express';
+import cors from 'cors';
+
+app.use(cors());
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -10,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 // Handle the video upload route
 app.post('/api/video/upload', (req, res) => {
     console.log('uploading video');
-    
+
   // Check if there's a video file in the request body
   if (!req.body.video) {
     return res.status(400).json({ error: 'No video data provided.' });
