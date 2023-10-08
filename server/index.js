@@ -12,4 +12,4 @@ app.post('/api/video/upload', (req, res) => {
 
 
 
-app.listen(3000, () => console.log('Server ready, visit http://localhost:3000'))
+app.listen(3001, () => console.log('Server ready, visit http://localhost:3001'))
