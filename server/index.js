@@ -14,6 +14,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
+// This endpoint is used by the frontend to upload a video
+// The video is sent as a form-data request body
+// You can access the video using req.file
+// The video is stored in memory and is not written to disk
+
 app.post("/api/video/upload", upload.single("video"), (req, res) => {
   try {
     // Access the uploaded video file using req.file.buffer
