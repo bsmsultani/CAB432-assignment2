@@ -1,9 +1,12 @@
 import express from 'express';
 import cors from 'cors';
+import multer from 'multer';
 
 
 const app = express();
 const port = process.env.PORT || 3001;
+
+const upload = multer();
 
 
 app.use(cors());
@@ -11,24 +14,24 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Handle the video upload route
-app.post('/api/video/upload', (req, res) => {
-    console.log('uploading video');
+app.post("/api/video/upload", upload.single("video"), (req, res) => {
+  try {
+    // Access the uploaded video file using req.file.buffer
+    if (!req.file) {
+      return res.status(400).json({ error: "No video file provided" });
+    }
 
-  // Check if there's a video file in the request body
-  if (!req.body.video) {
-    return res.status(400).json({ error: 'No video data provided.' });
+    console.log(req.file);
+
+    // You can now process the video in-memory or perform other operations.
+    // For example, you can analyze the video using a library like ffmpeg.
+
+    // Send a success response
+    res.status(200).json({ message: "Video uploaded successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error uploading video" });
   }
-
-  // Access the video data from the request body
-  const videoData = req.body.video;
-
-  console.log(videoData);
-
-  // Now you can process the videoData as needed, e.g., you can save it to a database or perform other operations.
-
-  // Send a response indicating success
-  res.status(200).json({ message: 'Video data received and processed successfully.' });
 });
 
 // Start the server
