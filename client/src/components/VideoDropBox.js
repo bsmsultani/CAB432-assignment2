@@ -1,53 +1,75 @@
-import React, { useRef } from "react";
+import React, { useState, useRef } from 'react';
 import './videoDropBox.css';
 
-const VideoDropBox = () => {
-  // Create a ref to store the file input element
-  // a ref is a way to access a DOM element in React
-  // the video file is stored in the ref
-
+function VideoUploadForm() {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const videoFile = useRef(null);
+
   const SERVER = localStorage.getItem('server');
-  const UPLOAD_URL = `${SERVER}/api/video/upload`;
+  const UPLOAD_ENDPOINT = `${SERVER}/api/video/upload`;
 
-  // Function to handle form submission
-  // NEED TO ADD ERROR HANDLING SUCH AS IF NO FILE IS SELECTED
-  // IF THE SERVER IS DOWN, ETC.
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Create a FormData object to store the selected video file
-    const formData = new FormData();
-    formData.append('video', videoFile.current.files[0]);
 
-    fetch(UPLOAD_URL, {
-      method: 'POST',
-      body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-      alert(data);
-    })
-    .catch(err => {
-      console.log(err);
-      alert(`Error uploading video, ${err}`);
-    });
-  }
+    // Check if a file has been selected
+    if (!videoFile.current.files[0]) {
+      setUploadError('Please select a video file.');
+      return;
+    }
+    
+    // Clear any previous error messages
+    setUploadError('');
+
+    // Implement your file upload logic here
+    // Set uploading to true while the upload is in progress
+    setUploading(true);
+
+    try {
+      // Make an API request to upload the selected video file
+      const formData = new FormData();
+      formData.append('video', videoFile.current.files[0]);
+
+      // Replace the following with your actual API endpoint
+      const response = await fetch(UPLOAD_ENDPOINT, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('File upload failed.');
+      }
+
+      // Handle successful upload
+      alert('Video uploaded successfully.');
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      setUploadError('An error occurred during the upload.');
+    } finally {
+      // Reset the uploading state
+      setUploading(false);
+    }
+  };
 
   return (
     <div className="video-drop-box">
-      <form onSubmit={handleSubmit} className="upload-video">
-        <input 
-          type='file' 
-          name='video' 
-          accept="video/*" 
+      <form onSubmit={handleSubmit} className="upload-video" encType="multipart/form-data">
+        <input
+          type="file"
+          name="video"
+          accept="video/*"
           ref={videoFile}
+          disabled={uploading}
         />
-        <input type="submit" value="Upload" />
+        <input
+          type="submit"
+          value={uploading ? 'Uploading...' : 'Upload'}
+          disabled={uploading}
+        />
+        {uploadError && <p className="error-message">{uploadError}</p>}
       </form>
     </div>
   );
 }
 
-export default VideoDropBox;
+export default VideoUploadForm;

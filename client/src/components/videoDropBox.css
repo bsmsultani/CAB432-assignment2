@@ -1,14 +1,33 @@
+/* Define styles for the container */
 .video-drop-box {
-    padding: 5%;
-    text-align: center;
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
 }
 
-
+/* Define styles for the form */
 .upload-video {
-    padding: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-* {
-    border: 1px solid black;
+/* Define styles for the file input */
+.upload-video input[type="file"] {
+    margin-bottom: 10px;
+}
 
+/* Define styles for the submit button */
+.upload-video input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.upload-video input[type="submit"]:hover {
+    background-color: #0069d9;
 }
