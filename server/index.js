@@ -1,11 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 
-app.use(cors());
 
 const app = express();
 const port = process.env.PORT || 3001;
 
+
+app.use(cors());
 // Parse JSON and URL-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
