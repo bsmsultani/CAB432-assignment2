@@ -24,11 +24,11 @@ app.post("/api/video/upload", videoUpload);
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
-<<<<<<< HEAD
+
 
 
 
 
 app.listen(3001, () => console.log('Server ready, visit http://localhost:3001'))
-=======
->>>>>>> origin/main
+
+
