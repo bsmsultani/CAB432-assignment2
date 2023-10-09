@@ -20,6 +20,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/api/video/upload", videoUpload);
 
+// General error handler  ++ (added this just as good practice)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something is wrong.');
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
