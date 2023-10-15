@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.post("/api/video/upload", videoUpload);
 
-app.get("/api/parseframe/:fileId", parseFrame)
+app.get("/api/parseframe/:videoId", parseFrame)
 
 
 // Start the server
