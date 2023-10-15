@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './videoDropBox.css';
 
 function VideoUploadForm() {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
+  const [videoId, setVideoId] = useState(null);
+
   const videoFile = useRef(null);
 
   const SERVER = localStorage.getItem('server');
@@ -40,6 +42,20 @@ function VideoUploadForm() {
         throw new Error(`Error uploading video: ${response.status} ${response.statusText}`);
       }
 
+      const data = await response.json();
+      
+      setVideoId(data.videoId);
+
+      // CHANGE THIS LATERRR TO INCLUDE FRAME RATE
+
+      const res = await fetch(`${SERVER}/api/parseframe/${data.videoId}`)
+
+      if (!res.ok) {
+        throw new Error(`Parsing error: ${res.status} ${res.statusText}`);
+      }
+
+      alert('asked for frame parsing')
+
       // Handle successful upload
     } catch (error) {
       console.log(error);
@@ -49,6 +65,8 @@ function VideoUploadForm() {
       setUploading(false);
     }
   };
+
+
 
   return (
     <div className="video-drop-box">

@@ -4,6 +4,8 @@ import path from 'path';
 async function parseFrame(req, res, next) {
     const { videoId } = req.params;
 
+    console.log("videoId", videoId);
+
     const tempDir = os.tmpdir();
     const videoPath = path.join(tempDir, `${videoId}.mp4`);
 
