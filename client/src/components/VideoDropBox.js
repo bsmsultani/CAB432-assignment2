@@ -37,14 +37,13 @@ function VideoUploadForm() {
       });
 
       if (!response.ok) {
-        throw new Error('File upload failed.');
+        throw new Error(`Error uploading video: ${response.status} ${response.statusText}`);
       }
 
       // Handle successful upload
-      alert('Video uploaded successfully.');
     } catch (error) {
-      console.error('Error uploading video:', error);
-      setUploadError('An error occurred during the upload.');
+      console.log(error);
+      setUploadError(error.message);
     } finally {
       // Reset the uploading state
       setUploading(false);

@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import videoUpload from './middleware/videoUpload.js';
+import parseFrame from './middleware/parseFrame.js';
 
 
 const app = express();
@@ -19,6 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 // The video is stored in memory and is not written to disk
 
 app.post("/api/video/upload", videoUpload);
+
+app.get("/api/parseframe/:fileId", parseFrame)
+
 
 // Start the server
 app.listen(port, () => {
