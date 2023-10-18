@@ -1,4 +1,3 @@
-import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import ffmpeg from 'fluent-ffmpeg';
@@ -13,35 +12,19 @@ async function parseFrame(req, res, next) {
     const tempDir = os.tmpdir();
     const videoPath = path.join(tempDir, `${videoId}.mp4`);
 
-    // Parse the frame
-    await command.input(videoPath)
-        .outputOptions([
-            '-vf', 'select=eq(pict_type\,I)',
-            '-vsync', 'vfr',
-            '-r', '30',
-            '-qscale:v', '2',
-            '-an',
-            '-y',
-            '-f', 'image2',
-            'pipe:',
-        ])
-        .on('error', function(err) {
-            console.error('Error parsing frame:', err);
-        })
-        .on('end', function() {
-            console.log('Finished parsing frame.');
-        })
-        .run();
+    command.input(videoPath)
+    .on('end', () => {
+        console.log('Finished extracting frames.');
+        console.timeEnd('parseFrame');
+    })
+    .on('error', (err) => {
+        console.error('Error:', err);
+    })
+    .output(path.join(outputDir, 'frame-%04d.jpeg'))
+    .outputOptions(['-vf', 'fps=1,scale=480:-1', '-threads', '4', '-preset', 'ultrafast'])
+    .run();
 
-    // Save the frame to a folder
-    const outputDir = path.join(tempDir, 'frames');
-    if (!fs.existsSync(outputDir)) {
-        fs.mkdirSync(outputDir);
-    }
-    const framePath = path.join(outputDir, `${Date.now()}.png`);
-    fs.writeFileSync(framePath, Buffer.from(res.body));
-
-    res.sendStatus(200);
+    res.status(200).send({ message: 'Parsing frames' });
 }
 
 export default parseFrame;
