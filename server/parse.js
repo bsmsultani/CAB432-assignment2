@@ -24,10 +24,7 @@ async function parseFrame() {
         })
         .output(path.join(outputDir, 'frame-%04d.png')) // Output filename format
         .outputOptions(['-vf', 'fps=1']) // Extract one frame per second
-        .screenshots({
-            timestamps: ['00:00:60.000'], // Take a screenshot 
-            folder: outputDir,
-        });
+        .run();
 }
 
 (async () => {
