@@ -14,11 +14,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// This endpoint is used by the frontend to upload a video
-// The video is sent as a form-data request body
-// You can access the video using req.file
-// The video is stored in memory and is not written to disk
-
 app.post("/api/video/upload", videoUpload);
 
 app.get("/api/parseframe/:videoId", parseFrame)
