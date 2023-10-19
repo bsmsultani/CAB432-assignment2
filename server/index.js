@@ -1,7 +1,6 @@
 import express from 'express';
 import cors from 'cors';
 import videoUpload from './middleware/videoUpload.js';
-import parseFrame from './middleware/parseFrame.js';
 
 
 const app = express();
@@ -15,8 +14,6 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.post("/api/video/upload", videoUpload);
-
-app.get("/api/parseframe/:videoId", parseFrame)
 
 
 // Start the server
