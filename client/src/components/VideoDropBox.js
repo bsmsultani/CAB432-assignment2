@@ -80,7 +80,7 @@ function VideoUploadForm() {
         />
         <input
           type="submit"
-          value={uploading ? 'Uploading...' : 'Upload'}
+          value={uploading ? 'Processing...' : 'Upload'}
           disabled={uploading}
         />
         {uploadError && <p className="error-message">{uploadError}</p>}

@@ -58,19 +58,17 @@ class VideoAnalyser
       catch (err) { throw err; }
     }
 
+
     /**
-     * Parses a video frame by extracting frames from the video file and saving them as JPEG images.
+     * Parses a video file and extracts frames from it.
      * @async
-     * @function __parseFrame
-     * @memberof videoAnalyser
-     * @instance
-     * @throws {Error} If there is an error while extracting frames.
-     * @returns {Promise<void>} A Promise that resolves when the frames have been extracted and saved successfully.
+     * @returns {Promise<void>} A Promise that resolves when the frames have been extracted successfully,
+     * or rejects with an error if there was a problem.
      */
     async __parseFrame() {
       return new Promise((resolve, reject) => {
           const command = ffmpeg();
-
+          
           command.input(this.filePath)
           .on('end', () => {
               console.log('Finished extracting frames.');
@@ -85,6 +83,7 @@ class VideoAnalyser
           .run();
       });
     }
+
 
     /**
      * Analyzes the frames in the frames directory and returns an array of objects
@@ -101,7 +100,10 @@ class VideoAnalyser
           const framePath = path.join(this.framesDir, frame);
           const frameObjects = await this.__annotateFrame(framePath);
           if (!frameObjects) return;
-          objects.push({ path: framePath, objects: frameObjects });
+
+          const frameSec = frame.split('.')[0];
+
+          objects.push({ second: frameSec, objects: frameObjects });
         })
       );
       console.log('Finished analyzing frames.');
@@ -140,6 +142,10 @@ class VideoAnalyser
       } catch (error) {
           console.error('Error detecting objects in the image:', error);
       }
+    }
+
+    async analyseVideo() {
+
     }
 }
 
