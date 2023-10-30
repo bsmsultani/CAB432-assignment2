@@ -79,7 +79,7 @@ class VideoAnalyser
       });
   }
 
-  markVideoAsProcessed(videoHash) {
+  markVideoAsProcessed(videoHash) { //sadd makes the unique key
       return new Promise((resolve, reject) => {
           redisClient.sadd("processed_videos", videoHash, (err, result) => {
               if (err) reject(err);
