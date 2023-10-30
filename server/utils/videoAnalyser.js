@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ffmpeg from 'fluent-ffmpeg';
 import axios from 'axios';
 import crypto from 'crypto';
+import { spawn } from 'child_process';
 
 function generateMD5Hash(buffer) {
   const hash = crypto.createHash('md5');
@@ -17,31 +18,24 @@ const apiKey = "AIzaSyDIvVTx_Jrbf3utLtqiXt0zjZf_54ik1sU";
 class VideoAnalyser
 {
   
-    constructor(ReqFile, tempPathSave = null, redisClient = null)
+    constructor(tempPathSave = null, redisClient = null)
     {
       this.redisClient = redisClient;
-
-      if (!ReqFile) throw new Error('No video file uploaded.');
-      const { buffer, originalname } = ReqFile;
-      const fileExtension = path.extname(originalname).slice(1);
-      if (fileExtension !== 'mp4') throw new Error('Invalid video file type. File must be an mp4.');
-      this.originalname = originalname;
       this.videoId = uuidv4();
       if (!tempPathSave) this.tempPathSave = path.join(os.tmpdir(), this.videoId); fs.mkdirSync(this.tempPathSave);
       this.framesDir = path.join(this.tempPathSave, 'frames'); fs.mkdirSync(this.framesDir);
-      (async () => {
-        await this.initAnalysis(buffer, fileExtension);
-      }
-      )();
+      this.graphOutputDir = path.join(this.tempPathSave, 'graphs');
+      if (!fs.existsSync(this.graphOutputDir)) fs.mkdirSync(this.graphOutputDir);
       
 
     }
 
     async initAnalysis(buffer, fileExtension) {
+      this.videoHash = generateMD5Hash(buffer);
       const isProcessed = await this.isVideoProcessed();
       console.log('isProcessed', isProcessed);
 
-      if (!isProcessed) {
+      if (isProcessed == false || isProcessed == true) { // CHANGE LATER
           await this.__bufferToFile(buffer, fileExtension);
           await this.__parseFrame();
           const frames = await this.__analyseFrames();
@@ -54,8 +48,6 @@ class VideoAnalyser
   }
 
   async isVideoProcessed() {
-    
-    this.videoHash = generateMD5Hash(this.originalname);
     try {
       const isProcessed = await this.redisClient.sIsMember("processed_videos", this.videoHash);
       console.log('isProcessed', isProcessed);
@@ -70,9 +62,9 @@ class VideoAnalyser
 
 
   async __saveFramesTemp(frames) {
-    const framesPath = path.join(this.tempPathSave, 'frames.json');
-    fs.writeFileSync(framesPath, JSON.stringify(frames, null, 4));
-    console.log('Saved frames to:', framesPath);
+    this.jsonPath = path.join(this.tempPathSave, 'frames.json');
+    fs.writeFileSync(this.jsonPath, JSON.stringify(frames, null, 4));
+    console.log('Saved frames to:', this.jsonPath);
   }
 
 
@@ -121,6 +113,7 @@ class VideoAnalyser
           })
       );
       console.log('Finished analyzing frames.');
+      objects.sort((a, b) => a.second - b.second);
       return objects;
   }
 
@@ -149,7 +142,55 @@ class VideoAnalyser
       } catch (error) {
           console.error('Error detecting objects in the image:', error);
       }
-  }
+     }
+
+
+    plot_objects_overtime() {
+        return new Promise((resolve, reject) => {
+            console.log('Generating graph...');
+
+            let frames;
+            try {
+                frames = JSON.parse(fs.readFileSync(this.jsonPath));
+                if (!frames) throw new Error('No json data for frames found.');
+            } catch (error) { return reject(new Error('Error reading json files for frames: ' + error.message)); }
+
+            // get the largest second
+            const lastFrame = frames[frames.length - 1];
+            const firstSecond = frames[0].second;
+            const lastSecond = lastFrame.second;
+            const interval = parseInt((lastSecond - firstSecond) / 20);
+
+
+            const args = [
+                "--filepath", this.jsonPath,
+                "--output", this.graphOutputDir,
+                "--function", "plot_top_objects",
+                "--interval", interval.toString(),
+                "--output_dir", this.graphOutputDir,
+            ];
+
+            const scriptPath = path.join(path.dirname(new URL(import.meta.url).pathname), 'plot.py');
+
+            const process = spawn('python3', [scriptPath, ...args]);
+
+            process.on('exit', (code) => {
+                if (code === 0) {
+                    const fileName = "top_objects.html";
+                    const filePath = path.join(this.graphOutputDir, fileName);
+                    const file = fs.readFileSync(filePath);
+                    resolve(file);
+                } else {
+                    reject(new Error('Error generating graph.'));
+                }
+            });
+
+            process.stderr.on('data', (data) => {
+                console.error(`stderr: ${data}`);
+            });
+        });
+    }
+
 
   async analyseVideo() {
       

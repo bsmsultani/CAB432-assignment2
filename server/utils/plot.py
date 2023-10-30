@@ -51,11 +51,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate graphs from JSON file')
 
     parser.add_argument("--filepath", required=True, help="Path to the JSON file.")
-    parser.add_argument("--function", required=True, choices=["plot_top_objects", "compare_object_over_time", "plot_object_frequencies", "default"], help="Function to run.")
+    parser.add_argument("--function", required=True, choices=["plot_top_objects", "compare_object_over_time", "plot_object_frequencies"], help="Function to run.")
     parser.add_argument("--interval", type=int, default=20, help="Interval for the plot_top_objects function.")
     parser.add_argument("--n", type=int, default=20, help="Number of top objects for the plot_top_objects function.")
-    
-    parser.add_argument("--selected_objects", nargs='+', default=["Person"], help="List of objects for the compare_object_over_time function.")
+    parser.add_argument("--selected_objects", nargs='+', default=[], help="List of objects for the compare_object_over_time function.")
     parser.add_argument("--start", type=int, default=1, help="Start range for the plot_object_frequencies function.")
     parser.add_argument("--end", type=int, default=10, help="End range for the plot_object_frequencies function.")
     parser.add_argument("--output_dir", required=True, help="Output directory for the generated graphs.")
@@ -65,7 +64,14 @@ if __name__ == "__main__":
     df = load_data(args.filepath)
     df = preprocess_data(df)
     
-    if args.function == "default":
-        plot_top_objects(df, args.interval, args.n, os.path.join(args.output_dir, "top_objects.html"))
-        compare_object_over_time(df, args.selected_objects, os.path.join(args.output_dir, "compare_objects.html"))
-        plot_object_frequencies(df, args.start, args.end, os.path.join(args.output_dir, "object_frequencies.html"))
+    if args.function == "plot_top_objects":
+        output_path = os.path.join(args.output_dir, "top_objects.html")
+        plot_top_objects(df, args.interval, args.n, output_path)
+        
+    elif args.function == "compare_object_over_time":
+        output_path = os.path.join(args.output_dir, "compare_object_over_time.html")
+        compare_object_over_time(df, args.selected_objects, output_path)
+    
+    elif args.function == "plot_object_frequencies":
+        output_path = os.path.join(args.output_dir, "object_frequencies.html")
+        plot_object_frequencies(df, args.start, args.end, output_path)
