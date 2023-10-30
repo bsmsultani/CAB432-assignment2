@@ -3,36 +3,48 @@ import './videoDropBox.css';
 
 function VideoUploadForm() {
   const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState('');
-  const [videoId, setVideoId] = useState(null);
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [videoData, setVideoData] = useState(null);
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
 
   const videoFile = useRef(null);
 
   const SERVER = localStorage.getItem('server');
   const UPLOAD_ENDPOINT = `${SERVER}/api/video/upload`;
 
+  useEffect(() => {
+    setVideoData(null);
+    return () => {
+      if (videoPreviewUrl) {
+        URL.revokeObjectURL(videoPreviewUrl);
+      }
+    };
+  }, [videoPreviewUrl]);
+
+  const handleFileChange = () => {
+    const file = videoFile.current.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setVideoPreviewUrl(url);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Check if a file has been selected
     if (!videoFile.current.files[0]) {
-      setUploadError('Please select a video file.');
+      setUploadMessage('Please select a video file.');
       return;
     }
-    
-    // Clear any previous error messages
-    setUploadError('');
 
-    // Implement your file upload logic here
-    // Set uploading to true while the upload is in progress
+    setUploadMessage('');
     setUploading(true);
 
     try {
-      // Make an API request to upload the selected video file
       const formData = new FormData();
       formData.append('video', videoFile.current.files[0]);
+      setUploadMessage('Uploading video... may take a while.')
 
-      // Replace the following with your actual API endpoint
       const response = await fetch(UPLOAD_ENDPOINT, {
         method: 'POST',
         body: formData,
@@ -43,48 +55,50 @@ function VideoUploadForm() {
       }
 
       const data = await response.json();
+      setVideoData(data);
+
+      setUploadMessage('Video successfully uploaded and processed.')
       
-      setVideoId(data.videoId);
 
-      // CHANGE THIS LATERRR TO INCLUDE FRAME RATE
-
-      const res = await fetch(`${SERVER}/api/parseframe/${data.videoId}`)
-
-      if (!res.ok) {
-        throw new Error(`Parsing error: ${res.status} ${res.statusText}`);
-      }
-
-      alert('asked for frame parsing')
-
-      // Handle successful upload
     } catch (error) {
-      console.log(error);
-      setUploadError(error.message);
+      setUploadMessage(error.message);
     } finally {
-      // Reset the uploading state
       setUploading(false);
     }
   };
 
-
-
   return (
-    <div className="video-drop-box">
-      <form onSubmit={handleSubmit} className="upload-video" encType="multipart/form-data">
-        <input
-          type="file"
-          name="video"
-          accept="video/*"
-          ref={videoFile}
-          disabled={uploading}
-        />
-        <input
-          type="submit"
-          value={uploading ? 'Processing...' : 'Upload'}
-          disabled={uploading}
-        />
-        {uploadError && <p className="error-message">{uploadError}</p>}
-      </form>
+    <div>
+      <div className="video-drop-box">
+        <form onSubmit={handleSubmit} className="upload-video" encType="multipart/form-data">
+          <input
+            type="file"
+            name="video"
+            accept="video/mp4"
+            ref={videoFile}
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
+          <input
+            type="submit"
+            value={uploading ? 'Processing...' : 'Upload'}
+            disabled={uploading}
+          />
+          {uploadMessage && <p className="error-message">{uploadMessage}</p>}
+        </form>
+      </div>
+
+      {videoPreviewUrl && videoData && (
+        <div className='video-controls'>
+          <div className="video-preview">
+            <video controls src={videoPreviewUrl} />
+          </div>
+          <div className='search-in-video'>
+            <input type="text" placeholder="Search in video" />
+            <input type="submit" value="Search" />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

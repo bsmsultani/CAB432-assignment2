@@ -4,6 +4,8 @@ import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 import ffmpeg from 'fluent-ffmpeg';
 import axios from 'axios';
+import { exec } from 'child_process';
+
 
 const apiKey = "AIzaSyDIvVTx_Jrbf3utLtqiXt0zjZf_54ik1sU";
 
@@ -25,17 +27,17 @@ class VideoAnalyser
         await this.__bufferToFile(buffer, fileExtension);
         await this.__parseFrame();
         const frames = await this.__analyseFrames();
+        this.jsonPath = path.join(this.tempPathSave, 'frames.json');
 
-        // save the frames to a json file
-        const jsonPath = "./frames.json";
-
-        fs.writeFile(jsonPath, JSON.stringify(frames, null, 4), (err) => {
+        fs.writeFile(this.jsonPath, JSON.stringify(frames, null, 4), (err) => {
           if (err) {
             console.error(err);
             return;
           };
           console.log("File has been created");
         });
+        this.graph_dir = await this.__generate_plots();
+
       })();
     }
 
@@ -144,8 +146,21 @@ class VideoAnalyser
       }
     }
 
-    async analyseVideo() {
+    async __generate_plots() {
+      console.log("Generating plots...")
+      const script_path = path.join(process.cwd(), "utils", "plot.py");
+      const output_dir = path.join(this.tempPathSave, "graphs");
+      fs.mkdirSync(output_dir);
+      const command = `python3 ${script_path} --filepath ${this.jsonPath} --output_dir ${output_dir} --function default`;
 
+      exec(command, (err, stdout, stderr) => {
+        if (err) {
+          console.log(`Error: ${err}`);
+          return;
+        }
+      });
+
+      return output_dir;
     }
 }
 
