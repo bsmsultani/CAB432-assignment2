@@ -1,0 +1,57 @@
+.video-drop-box {
+    margin: 20px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.upload-video {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.upload-video input[type="file"] {
+    margin-bottom: 10px;
+}
+
+.upload-video input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.upload-video input[type="submit"]:hover {
+    background-color: #0069d9;
+}
+
+.video-controls {
+    border: 1px solid #ccc;
+    margin: 20px;
+    display: flex;
+}
+
+.video-preview {
+    text-align: left;    
+}
+
+.search-in-video input {
+    margin: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+
+.search-in-video input[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
