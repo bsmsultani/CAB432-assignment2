@@ -7,7 +7,7 @@ async function upload(req, res, next) {
         return res.status(400).send({ message: "Missing video_hash" });
     }
 
-    
+
     const video_hash = req.body.video_hash;
 
     console.log('video_hash', video_hash);
@@ -18,9 +18,10 @@ async function upload(req, res, next) {
     }
 
     const s3 = new S3Utils(req.AWS);
-    const url = await s3.getSignedUrl(video_hash);
+    const url = await s3.getSignedUrlForUpload(video_hash);
+    console.log('url', url);
     
-    res.status(200).send({ s3url: url});
+    res.status(200).send({ s3Url: url});
 }
 
 export default upload;

@@ -20,6 +20,23 @@ class S3Utils {
             throw error;
         }
     }
+    
+    async getSignedUrlForUpload(key, contentType = 'video/mp4') {
+        const params = {
+            Bucket: this.bucketName,
+            Key: key,
+            Expires: 600, // URL will expire in 60 seconds
+            ContentType: contentType
+        };
+    
+        try {
+            const url = await this.s3.getSignedUrlPromise("putObject", params);
+            return url;
+        } catch (error) {
+            console.error("Error getting signed URL for upload:", error);
+            throw error;
+        }
+    }    
 
 
     async listBucketContents() {
