@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import CryptoJS from 'crypto-js'; // Import the CryptoJS library
 import './videoDropBox.css';
 
 function VideoUploadForm() {
@@ -10,7 +11,7 @@ function VideoUploadForm() {
   const videoFile = useRef(null);
 
   const SERVER = localStorage.getItem('server');
-  const UPLOAD_ENDPOINT = `${SERVER}/api/video/upload`;
+  const UPLOAD_ENDPOINT = `${SERVER}/api/video/upload`; // Endpoint for hash upload
 
   useEffect(() => {
     setVideoData(null);
@@ -32,7 +33,8 @@ function VideoUploadForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!videoFile.current.files[0]) {
+    const file = videoFile.current.files[0];
+    if (!file) {
       setUploadMessage('Please select a video file.');
       return;
     }
@@ -41,25 +43,29 @@ function VideoUploadForm() {
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('video', videoFile.current.files[0]);
-      setUploadMessage('Uploading video... may take a while.')
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const binary = event.target.result;
+        const hash = CryptoJS.SHA256(binary).toString(CryptoJS.enc.Hex);
 
-      const response = await fetch(UPLOAD_ENDPOINT, {
-        method: 'POST',
-        body: formData,
-      });
+        const response = await fetch(UPLOAD_ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ video_hash: hash }),
+        });
 
-      if (!response.ok) {
-        throw new Error(`Error uploading video: ${response.status} ${response.statusText}`);
-      }
+        if (!response.ok) {
+          throw new Error(`Error uploading hash: ${response.status} ${response.statusText}`);
+        }
 
-      const data = await response.json();
-      setVideoData(data);
+        const data = await response.json();
+        setVideoData(data);
 
-      setUploadMessage('Video successfully uploaded and processed.')
-      
-
+        setUploadMessage('Hash successfully uploaded and processed.')
+      };
+      reader.readAsBinaryString(file);
     } catch (error) {
       setUploadMessage(error.message);
     } finally {
