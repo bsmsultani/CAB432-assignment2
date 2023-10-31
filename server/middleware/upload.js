@@ -1,4 +1,3 @@
-import path from 'path';
 import RedisUtils from '../utils/redisUtils.js';
 import S3Utils from '../utils/s3Utils.js';
 
@@ -7,10 +6,7 @@ async function upload(req, res, next) {
         return res.status(400).send({ message: "Missing video_hash" });
     }
 
-
     const video_hash = req.body.video_hash;
-
-    console.log('video_hash', video_hash);
 
     const redis = new RedisUtils(req.redisClient, video_hash);
     if (await redis.isVideoProcessed()) {
@@ -18,9 +14,8 @@ async function upload(req, res, next) {
     }
 
     const s3 = new S3Utils(req.AWS);
+    await redis.markVideoAsProcessed();
     const url = await s3.getSignedUrlForUpload(video_hash);
-    console.log('url', url);
-    
     res.status(200).send({ s3Url: url});
 }
 
