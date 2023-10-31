@@ -1,4 +1,3 @@
-
 class SqsUtils {
     constructor(aws) {
         this.sqs = new aws.SQS({
@@ -6,28 +5,40 @@ class SqsUtils {
         });
     }
 
-    // Method to print jobs from the SQS queue
-    printJobs() {
-        const params = {
-            QueueUrl: this.sqs.endpoint.href, // Use the endpoint URL as the queue URL
-            MaxNumberOfMessages: 10 // Adjust based on how many messages you want to retrieve
+    // Method to start polling the SQS queue
+    startPolling() {
+        console.log("Starting SQS polling...");
+
+        const poll = () => {
+            const params = {
+                QueueUrl: this.sqs.endpoint.href,
+                MaxNumberOfMessages: 10, // Adjust based on how many messages you want to retrieve
+                WaitTimeSeconds: 20 // Enable long polling (up to 20 seconds)
+            };
+
+            this.sqs.receiveMessage(params, (err, data) => {
+                if (err) {
+                    console.error("Error retrieving messages from SQS:", err);
+                } else {
+                    if (data.Messages && data.Messages.length > 0) {
+                        data.Messages.forEach((message) => {
+                            console.log("Processing message: ", message.Body);
+                            // Process the message here
+                            // Optionally, you can also delete the message after processing
+                            // this.deleteMessage(message.ReceiptHandle);
+                        });
+                    } else {
+                        console.log("No messages found in the queue.");
+                    }
+
+                    // Continue polling
+                    poll();
+                }
+            });
         };
 
-        this.sqs.receiveMessage(params, (err, data) => {
-            if (err) {
-                console.error("Error retrieving messages from SQS:", err);
-            } else {
-                if (data.Messages && data.Messages.length > 0) {
-                    data.Messages.forEach((message) => {
-                        console.log("Message: ", message.Body);
-                        // Optionally, you can also delete the message after processing
-                        // this.deleteMessage(message.ReceiptHandle);
-                    });
-                } else {
-                    console.log("No messages found in the queue.");
-                }
-            }
-        });
+        // Start the polling process
+        poll();
     }
 
     // Optional method to delete a message after processing
@@ -47,4 +58,3 @@ class SqsUtils {
     }
 }
 
-export default SqsUtils;
