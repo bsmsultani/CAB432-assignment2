@@ -1,6 +1,7 @@
 class RedisUtils {
     constructor(redisClient, videoHash) {
         this.redisClient = redisClient;
+        this.videoHash = videoHash;
     }
 
     async isVideoProcessed() {

@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "aws-sdk": "^2.1484.0",
     "axios": "^1.5.1",
     "cors": "^2.8.5",
     "express": "^4.18.2",
