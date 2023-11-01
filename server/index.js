@@ -41,8 +41,6 @@ app.use((req, res, next) => {
 app.post('/api/video/upload', upload);
 
 
-app.post("/api/video/upload", videoUpload);
-
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
