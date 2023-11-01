@@ -20,7 +20,7 @@ async function videoData(req, res, next) {
 
     let jsonData;
     try {
-        // Assuming the content is UTF-8 encoded
+        
         const content = file.Body.toString('utf-8');
         jsonData = JSON.parse(content);
     } catch (error) {

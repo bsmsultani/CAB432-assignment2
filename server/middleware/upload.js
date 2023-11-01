@@ -9,15 +9,30 @@ async function upload(req, res, next) {
 
     const video_hash = req.body.video_hash;
     const redis = new RedisUtils(req.redisClient, video_hash);
-
-    await redis.deleteVideoFromProcessed();
+    const s3 = new S3Utils(req.AWS);
 
     if (await redis.isVideoProcessed()) {
-        return res.status(200).send({ message: "Video already processed" });
+        const file = await s3.getObject(`${videoHash}/frames.json`);
+        if (!file) {
+            return res.status(404).send({ message: "Video not found" });
+        }
+
+        let jsonData;
+
+        try {
+            const content = file.Body.toString('utf-8');
+            jsonData = JSON.parse(content);
+        } catch (error) {
+            console.error('Error parsing JSON from file:', error);
+            return res.status(500).send({ message: "Error processing video data" });
+        }
+
+        return res.send({ jsonData: jsonData });
+        
     }
 
-    const s3 = new S3Utils(req.AWS);
-    // await redis.markVideoAsProcessed();
+    await redis.markVideoAsProcessed();
+        
     const key = `${video_hash}/video.mp4`;
     const url = await s3.getSignedUrlForUpload(key);
     res.status(200).send({ s3Url: url});
