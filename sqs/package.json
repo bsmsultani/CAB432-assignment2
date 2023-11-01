@@ -1,0 +1,8 @@
+{
+  "type": "module",
+  "dependencies": {
+    "aws-sdk": "^2.1485.0",
+    "axios": "^1.6.0",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}

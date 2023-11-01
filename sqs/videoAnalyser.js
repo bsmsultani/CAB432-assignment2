@@ -18,7 +18,7 @@ const apiKey = "AIzaSyDIvVTx_Jrbf3utLtqiXt0zjZf_54ik1sU";
 class VideoAnalyser
 {
   
-    constructor(tempPathSave = null, redisClient = null)
+    constructor(videoHash, s3)
     {
       this.redisClient = redisClient;
       this.videoId = uuidv4();
@@ -66,6 +66,7 @@ class VideoAnalyser
     fs.writeFileSync(this.jsonPath, JSON.stringify(frames, null, 4));
     console.log('Saved frames to:', this.jsonPath);
   }
+  
 
 
   async __bufferToFile(buffer, fileExtension) {

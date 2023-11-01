@@ -1,6 +1,5 @@
 import express from 'express';
 import cors from 'cors';
-import videoUpload from './middleware/videoUpload.js';
 import redis from 'redis'; // Import the redis module
 import upload from './middleware/upload.js';
 import AWS from 'aws-sdk';
