@@ -1,0 +1,6 @@
+install nodejs
+install npm
+install ffmpeg
+install node modules
+install python3 and pip3
+install plot.py modules
