@@ -3,6 +3,8 @@
   "dependencies": {
     "aws-sdk": "^2.1485.0",
     "axios": "^1.6.0",
-    "fluent-ffmpeg": "^2.1.2"
+    "ffmpeg": "^0.0.4",
+    "fluent-ffmpeg": "^2.1.2",
+    "redis": "^4.6.10"
   }
 }
