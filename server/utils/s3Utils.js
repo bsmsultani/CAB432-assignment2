@@ -5,6 +5,22 @@ class S3Utils {
         this.bucketName = "cab432group100";
     }
 
+    async getObject (key) {
+        const params = {
+            Bucket: this.bucketName,
+            Key: key
+        };
+
+        try {
+            const data = await this.s3.getObject(params).promise();
+            return data;
+        } catch (error) {
+            console.error("Error getting object:", error);
+            throw error;
+        }
+    }
+    
+
     async getSignedUrl(key) {
         const params = {
             Bucket: this.bucketName,

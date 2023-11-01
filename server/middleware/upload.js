@@ -18,7 +18,8 @@ async function upload(req, res, next) {
 
     const s3 = new S3Utils(req.AWS);
     // await redis.markVideoAsProcessed();
-    const url = await s3.getSignedUrlForUpload(video_hash);
+    const key = `${video_hash}/video.mp4`;
+    const url = await s3.getSignedUrlForUpload(key);
     res.status(200).send({ s3Url: url});
 }
 
