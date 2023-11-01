@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import redis from 'redis'; // Import the redis module
+import redis from 'redis';
 import upload from './middleware/upload.js';
-import graphs from './middleware/graphs.js';
+import videoData from './middleware/videoData.js';
 import AWS from 'aws-sdk';
+
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -41,7 +42,7 @@ app.use((req, res, next) => {
 app.post('/api/video/upload', upload);
 
 
-app.post('/api/video/graphs', graphs);
+app.post('/api/video/data', videoData);
 
 
 // Start the server

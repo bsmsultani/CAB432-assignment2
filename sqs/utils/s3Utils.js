@@ -14,6 +14,15 @@ class S3Utils {
         return await this.s3.getObject(params).promise();
     }
 
+    async putObject(key, body) {
+        const params = {
+            Bucket: this.bucketName,
+            Key: key,
+            Body: body
+        };
+        return await this.s3.putObject(params).promise();
+    }
+
 }
 
 export default S3Utils

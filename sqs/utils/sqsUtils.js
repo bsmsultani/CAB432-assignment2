@@ -31,6 +31,7 @@ class SqsUtils {
 
                         data.Messages.forEach(async message => {
                             try {
+                                                                
                                 const parsedBody = JSON.parse(message.Body);
                                 console.log("Parsed message body: ", parsedBody);
                         

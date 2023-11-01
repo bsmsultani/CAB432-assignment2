@@ -8,6 +8,7 @@ function VideoUploadForm() {
   const [s3Url, setS3Url] = useState(null);
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [videoHash, setVideoHash] = useState(null);
 
   const videoFile = useRef(null);
 
@@ -31,6 +32,7 @@ function VideoUploadForm() {
     }
   };
 
+
   const calculateHash = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -48,37 +50,65 @@ function VideoUploadForm() {
     });
   };
 
-  const uploadToS3 = async () => {
-    const file = videoFile.current.files[0];
-    const xhr = new XMLHttpRequest();
+  const uploadToS3 = () => {
+    return new Promise((resolve, reject) => {
+      const file = videoFile.current.files[0];
+      const xhr = new XMLHttpRequest();
 
-    xhr.open('PUT', s3Url);
+      xhr.open('PUT', s3Url);
 
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percentComplete = (event.loaded / event.total) * 100;
-        setUploadMessage(`Uploading to S3: ${Math.floor(percentComplete)}% (${event.loaded} of ${event.total} bytes)`);
-      }
-    };
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = (event.loaded / event.total) * 100;
+          setUploadMessage(`Uploading to S3: ${Math.floor(percentComplete)}% (${event.loaded} of ${event.total} bytes)`);
+        }
+      };
 
-    xhr.onload = () => {
-      if (xhr.status === 200) {
-        setUploadMessage('Video uploaded successfully');
-        setShowPreview(true);
-      } else {
-        setUploadMessage(`Error uploading to S3: ${xhr.status} ${xhr.statusText}`);
-      }
-      setUploading(false);
-    };
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          resolve(true);
+        } else {
+          reject(new Error(`Error uploading: ${xhr.status} ${xhr.statusText}`));
+        }
+      };
 
-    xhr.onerror = () => {
-      setUploadMessage(`Error uploading to S3: ${xhr.status} ${xhr.statusText}`);
-      setUploading(false);
-    };
+      xhr.onerror = () => {
+        reject(new Error(`Error uploading: ${xhr.status} ${xhr.statusText}`));
+      };
 
-    xhr.setRequestHeader('Content-Type', 'video/mp4');
-    xhr.send(file);
+      xhr.setRequestHeader('Content-Type', 'video/mp4');
+      xhr.send(file);
+    });
   };
+
+
+  const getVideoData = async () => {
+    try {
+      const result = await fetch(`${SERVER}/api/video/data`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ video_hash: videoHash }),
+      });
+  
+      if (!result.ok) {
+        throw new Error(`Error fetching video data: ${result.status} ${result.statusText}`);
+      }
+  
+      const data = await result.json();
+  
+      if (data.jsonData) {
+        console.log('Video data received:', data.jsonData);
+
+      } else {
+        console.log('Video data not available yet, retrying...');
+        setTimeout(getVideoData, 3000);
+      }
+    } catch (error) {
+      console.error('Error fetching video data:', error);
+      setTimeout(getVideoData, 3000);
+    }
+  };
+
 
   useEffect(() => {
     if (!s3Url) {
@@ -86,8 +116,19 @@ function VideoUploadForm() {
     }
 
     setUploadMessage('Preparing to upload...');
-    uploadToS3();
+    uploadToS3()
+      .then(() => {
+          setUploadMessage('Video uploaded successfully');
+          setShowPreview(true);
+          getVideoData();
+          setUploading(false);
+      })
+      .catch((error) => {
+          setUploadMessage(error.message);
+      });
+
   }, [s3Url]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -103,6 +144,7 @@ function VideoUploadForm() {
 
     try {
       const hash = await calculateHash(file);
+      setVideoHash(hash);
 
       const response = await fetch(UPLOAD_ENDPOINT, {
         method: 'POST',
@@ -113,9 +155,7 @@ function VideoUploadForm() {
       if (!response.ok) {
         throw new Error(`Error uploading hash: ${response.status} ${response.statusText}`);
       }
-
       const data = await response.json();
-
       if (data.s3Url) {
         setS3Url(data.s3Url);
         setUploadMessage('Video is not processed yet.');
@@ -127,7 +167,9 @@ function VideoUploadForm() {
       setUploadMessage(error.message);
       setUploading(false);
     }
-  }; // Missing curly brace added here
+  };
+
+
 
   return (
     <div>
@@ -161,7 +203,7 @@ function VideoUploadForm() {
           </div>
         </div>
       )}
-    </div>
+  </div>
   );
 }
 

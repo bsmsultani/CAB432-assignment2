@@ -3,9 +3,6 @@ import path from 'path';
 import fs from 'fs';
 import ffmpeg from 'fluent-ffmpeg';
 import axios from 'axios';
-import { spawn } from 'child_process';
-
-// Assuming apiKey and other dependencies are defined elsewhere
 
 const apiKey = "AIzaSyDIvVTx_Jrbf3utLtqiXt0zjZf_54ik1sU";
 
@@ -19,7 +16,7 @@ class Analyser {
         const file = await this.s3.getObject(videoKey);
         const videoBuffer = file.Body;
 
-        const videoHash = videoKey;
+        const videoHash = videoKey.split('/')[0];
         const tempPathSave = path.join(os.tmpdir(), videoHash);
 
         // Create directories for saving the video and extracted frames
@@ -43,12 +40,12 @@ class Analyser {
         // Save frames analysis results
         const jsonPath = path.join(tempPathSave, 'frames.json');
         fs.writeFileSync(jsonPath, JSON.stringify(frames, null, 4));
-        
-        // Further processing can be done here...
-        const graphOutputDir = path.join(tempPathSave, 'graphs'); // Added 'const' here
-        fs.mkdirSync(graphOutputDir, { recursive: true });
 
-        await this.plot_objects_overtime(jsonPath, graphOutputDir);
+        // Upload the results to S3
+        await this.s3.uploadObject(`${videoHash}/frames.json`, jsonPath);
+
+        fs.rmdirSync(graphOutputDir, { recursive: true });
+        
 
     }
 
@@ -108,51 +105,6 @@ class Analyser {
             console.error('Error detecting objects in the image:', error);
             return null;
         }
-    }
-
-    plot_objects_overtime(jsonPath, graphOutputDir) {
-        return new Promise((resolve, reject) => {
-            console.log('Generating graph...');
-            let frames;
-
-            try {
-                frames = JSON.parse(fs.readFileSync(jsonPath));
-                if (!frames) throw new Error('No json data for frames found.');
-            } catch (error) {
-                return reject(new Error('Error reading json files for frames: ' + error.message));
-            }
-
-            const lastFrame = frames[frames.length - 1];
-            const firstSecond = frames[0].second;
-            const lastSecond = lastFrame.second;
-            const interval = parseInt((lastSecond - firstSecond) / 20);
-
-            const args = [
-                "--filepath", jsonPath,
-                "--output", graphOutputDir,
-                "--function", "plot_top_objects",
-                "--interval", interval.toString(),
-                "--output_dir", graphOutputDir,
-            ];
-
-            const scriptPath = path.join(path.dirname(new URL(import.meta.url).pathname), 'plot.py');
-            const process = spawn('python3', [scriptPath, ...args]);
-
-            process.on('exit', (code) => {
-                if (code === 0) {
-                    const fileName = "top_objects.html";
-                    const filePath = path.join(graphOutputDir, fileName);
-                    const file = fs.readFileSync(filePath);
-                    resolve(file);
-                } else {
-                    reject(new Error('Error generating graph.'));
-                }
-            });
-
-            process.stderr.on('data', (data) => {
-                console.error(`stderr: ${data}`);
-            });
-        });
     }
 
 }

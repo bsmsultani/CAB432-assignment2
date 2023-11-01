@@ -19,6 +19,21 @@ class S3Utils {
             throw error;
         }
     }
+
+    async getObjectsInFolder (folder) {
+        const params = {
+            Bucket: this.bucketName,
+            Prefix: folder
+        };
+
+        try {
+            const data = await this.s3.listObjectsV2(params).promise();
+            return data.Contents;
+        } catch (error) {
+            console.error("Error getting objects in folder:", error);
+            throw error;
+        }
+    }
     
 
     async getSignedUrl(key) {
