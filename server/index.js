@@ -7,7 +7,7 @@ import AWS from 'aws-sdk';
 
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = 3001;
 
 // Connect to EC2 to get this working (cab432group109 is the cluster name)
 

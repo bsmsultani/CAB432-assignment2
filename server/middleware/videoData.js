@@ -34,7 +34,7 @@ async function videoData(req, res, next) {
             return;
         }
         console.error('Error in videoData middleware:', error);
-        res.status(500).send('Error processing video data');
+        res.status(500).send('Error processing video data', error);
     }
 }
 
