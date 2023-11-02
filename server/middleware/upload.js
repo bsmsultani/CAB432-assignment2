@@ -12,7 +12,7 @@ async function upload(req, res, next) {
     const s3 = new S3Utils(req.AWS);
 
     if (await redis.isVideoProcessed()) {
-        const file = await s3.getObject(`${videoHash}/frames.json`);
+        const file = await s3.getObject(`${video_hash}/frames.json`);
         if (!file) {
             return res.status(404).send({ message: "Video not found" });
         }
