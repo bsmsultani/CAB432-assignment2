@@ -14,7 +14,7 @@ try {
     const sqsUtils = new SqsUtils(AWS);
     sqsUtils.startPolling();
 } catch (e) {
-    console.log(e);
+    throw e;
 }
 
 app.get("/", (req, res) => {
