@@ -51,7 +51,7 @@ class SqsUtils {
                                 console.error("Error parsing message body: ", error);
                             }
 
-                            // this.deleteMessage(message.ReceiptHandle);
+                            this.deleteMessage(message.ReceiptHandle);
 
                         });
                         

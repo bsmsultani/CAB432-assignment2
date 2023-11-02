@@ -42,9 +42,11 @@ class Analyser {
         fs.writeFileSync(jsonPath, JSON.stringify(frames, null, 4));
 
         // Upload the results to S3
-        await this.s3.uploadObject(`${videoHash}/frames.json`, jsonPath);
 
-        fs.rmdirSync(graphOutputDir, { recursive: true });
+        console.log("Uploading frames.json to S3");
+        await this.s3.putObject(`${videoHash}/frames.json`, jsonPath);
+
+        fs.rmdirSync(tempPathSave, { recursive: true });
         
 
     }
