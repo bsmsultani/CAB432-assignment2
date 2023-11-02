@@ -17,7 +17,7 @@ class SqsUtils {
         const poll = () => {
             const params = {
                 QueueUrl: this.sqs.endpoint.href,
-                MaxNumberOfMessages: 10,
+                MaxNumberOfMessages: 5,
                 WaitTimeSeconds: 20
             };
 
@@ -27,11 +27,11 @@ class SqsUtils {
                 } else {
                     if (data.Messages && data.Messages.length > 0) {
 
-
-
                         data.Messages.forEach(async message => {
                             try {
-                                                                
+
+                                this.extendMessageVisibility(message.ReceiptHandle, 30);
+
                                 const parsedBody = JSON.parse(message.Body);
                         
                                 const records = parsedBody.Records;
@@ -48,9 +48,9 @@ class SqsUtils {
                                 else { throw new Error("No records found in message body"); }
                             } catch (error) {
                                 console.error("Error parsing message body: ", error);
+                            } finally {
+                                this.deleteMessage(message.ReceiptHandle);
                             }
-
-                            this.deleteMessage(message.ReceiptHandle);
 
                         });
                         
@@ -77,6 +77,22 @@ class SqsUtils {
                 console.error("Error deleting message from SQS:", err);
             } else {
                 console.log("Message deleted successfully");
+            }
+        });
+    }
+
+    extendMessageVisibility(receiptHandle, seconds) {
+        const params = {
+            QueueUrl: this.sqs.endpoint.href,
+            ReceiptHandle: receiptHandle,
+            VisibilityTimeout: seconds
+        };
+
+        this.sqs.changeMessageVisibility(params, (err, data) => {
+            if (err) {
+                console.error("Error extending message visibility:", err);
+            } else {
+                console.log("Message visibility extended successfully");
             }
         });
     }

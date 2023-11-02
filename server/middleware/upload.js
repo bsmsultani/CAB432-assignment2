@@ -14,7 +14,7 @@ async function upload(req, res, next) {
     const redis = new RedisUtils(req.redisClient, video_hash);
     const s3 = new S3Utils(req.AWS);
 
-    redis.deleteVideoFromProcessed();
+    // redis.deleteVideoFromProcessed();
 
     if (await redis.isVideoProcessed()) {
         const file = await s3.getObject(`${video_hash}/frames.json`);

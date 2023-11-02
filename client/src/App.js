@@ -7,7 +7,7 @@ function App() {
   // const server = process.env.REACT_APP_SERVER_URL;
   // get the server url from the environment variable during docker deployment
 
-  const server = 'http://localhost:3001';
+  const server = 'http://group109-loadbalancer-1764708288.ap-southeast-2.elb.amazonaws.com';
   localStorage.setItem('server', server);
 
 

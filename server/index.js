@@ -39,6 +39,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.get('/', (req, res) => {
+  res.status(200).send('Hello, world!');
+});
+
+
 app.post('/api/video/upload', upload);
 
 
