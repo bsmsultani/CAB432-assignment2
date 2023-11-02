@@ -21,6 +21,6 @@ app.get("/", (req, res) => {
     res.status(200).send("Hello World!");
 });
 
-app.listen(3000, () => {
+app.listen(3002, () => {
     console.log("SQS app listening on port 3000!");
 });
