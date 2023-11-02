@@ -33,7 +33,6 @@ class SqsUtils {
                             try {
                                                                 
                                 const parsedBody = JSON.parse(message.Body);
-                                console.log("Parsed message body: ", parsedBody);
                         
                                 const records = parsedBody.Records;
                                 if (records && records.length > 0) {

@@ -37,14 +37,12 @@ class Analyser {
         // Analyze frames
         const frames = await this.__analyseFrames(framesDir);
 
-        // Save frames analysis results
-        const jsonPath = path.join(tempPathSave, 'frames.json');
-        fs.writeFileSync(jsonPath, JSON.stringify(frames, null, 4));
+        const framesJson = JSON.stringify(frames, null, 2);
 
-        // Upload the results to S3
+
 
         console.log("Uploading frames.json to S3");
-        await this.s3.putObject(`${videoHash}/frames.json`, jsonPath);
+        await this.s3.uploadObject(`${videoHash}/frames.json`, framesJson);
 
         fs.rmdirSync(tempPathSave, { recursive: true });
         
