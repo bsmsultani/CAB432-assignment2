@@ -15,7 +15,6 @@ class S3Utils {
             const data = await this.s3.getObject(params).promise();
             return data;
         } catch (error) {
-            console.error("Error getting object:", error);
             throw error;
         }
     }

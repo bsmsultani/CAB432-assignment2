@@ -160,6 +160,7 @@ function VideoUploadForm() {
         setS3Url(data.s3Url);
         setUploadMessage('Video is not processed yet.');
       } else {
+        console.log(data.jsonData);
         setUploadMessage('Video is already processed.');
         setUploading(false);
       }
