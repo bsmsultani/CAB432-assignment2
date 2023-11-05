@@ -10,9 +10,6 @@ function App() {
   const server = 'http://group109lb-1372671419.ap-southeast-2.elb.amazonaws.com';
   localStorage.setItem('server', server);
 
-
-
-
   return (
     <div className="App">
       <VideoDropBox />

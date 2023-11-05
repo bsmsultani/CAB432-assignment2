@@ -1,6 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import CryptoJS from 'crypto-js';
 import './videoDropBox.css';
+import VideoPreview from './VideoPreview';
+import './CommonObjectsChart.js';
+import CommonObjectsChart from './CommonObjectsChart.js';
+
 
 function VideoUploadForm() {
   const [uploading, setUploading] = useState(false);
@@ -9,6 +13,7 @@ function VideoUploadForm() {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
   const [videoHash, setVideoHash] = useState(null);
+  const [videoData, setVideoData] = useState(null);
 
   const videoFile = useRef(null);
 
@@ -97,6 +102,7 @@ function VideoUploadForm() {
       const data = await result.json();
   
       if (data.jsonData) {
+        setVideoData(data.jsonData);
         console.log('Video data received:', data.jsonData);
 
       } else {
@@ -160,7 +166,8 @@ function VideoUploadForm() {
         setS3Url(data.s3Url);
         setUploadMessage('Video is not processed yet.');
       } else {
-        console.log(data.jsonData);
+        setVideoData(data.jsonData);
+        setShowPreview(true);
         setUploadMessage('Video is already processed.');
         setUploading(false);
       }
@@ -189,21 +196,22 @@ function VideoUploadForm() {
             value={uploading ? 'Processing...' : 'Upload'}
             disabled={uploading}
           />
+          <br></br>
+          <sub>File type allowed: MP4 only</sub>
           {uploadMessage && <p className="error-message">{uploadMessage}</p>}
         </form>
       </div>
-
-      {videoPreviewUrl && showPreview && (
-        <div className='video-controls'>
-          <div className="video-preview">
-            <video controls src={videoPreviewUrl} />
-          </div>
-          <div className='search-in-video'>
-            <input type="text" placeholder="Search in video" />
-            <input type="submit" value="Search" />
-          </div>
+      {showPreview && (
+        <div>
+          <VideoPreview
+            videoPreviewUrl={videoPreviewUrl}
+            showPreview={showPreview}
+            videoData={videoData}
+          />
+          <CommonObjectsChart videoData={videoData} />
         </div>
       )}
+
   </div>
   );
 }
