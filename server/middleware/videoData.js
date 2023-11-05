@@ -1,5 +1,17 @@
 import S3Utils from "../utils/s3Utils.js";
 
+/**
+ * Middleware function that retrieves video data from AWS S3 and sends it as a JSON response.
+ * @async
+ * @function videoData
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @throws {Error} If there is an error processing the video data.
+ * @returns {Promise<void>} - Promise that resolves when the response is sent.
+ */
+
+
 async function videoData(req, res, next) {
 
     console.log('videoData middleware called');

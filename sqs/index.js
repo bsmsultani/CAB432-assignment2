@@ -1,26 +1,17 @@
 import SqsUtils from "./utils/sqsUtils.js";
 import AWS from "aws-sdk";
-import express from "express";
 
-
-const app = express();
-
-try {
-
-    AWS.config.update({
-        region: "ap-southeast-2"
-    });
-
-    const sqsUtils = new SqsUtils(AWS);
-    sqsUtils.startPolling();
-} catch (e) {
-    throw e;
-}
-
-app.get("/", (req, res) => {
-    res.status(200).send("Hello World!");
+AWS.config.update({
+    region: "ap-southeast-2"
 });
 
-app.listen(3002, () => {
-    console.log("SQS app listening on port 3000!");
-});
+/**
+ * Creates a new instance of SqsUtils with the provided AWS object.
+ * Uses SQS queue to poll for new messages.
+ * @param {Object} AWS - The AWS object to use for creating the SqsUtils instance.
+ * @returns {SqsUtils} A new instance of SqsUtils.
+ */
+
+const sqsUtils = new SqsUtils(AWS);
+sqsUtils.startPolling();
+

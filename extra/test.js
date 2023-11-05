@@ -1,4 +1,4 @@
-import S3Utils from "./s3Utils.js";
+import S3Utils from "../server/utils/s3Utils.js";
 import AWS from "aws-sdk";
 import path from "path";
 

@@ -1,10 +1,24 @@
 
+/**
+ * A utility class for interacting with AWS S3.
+ */
+
 class S3Utils {
+    /**
+     * Creates an instance of S3Utils.
+     * @param {Object} aws - The AWS SDK object.
+     */
     constructor(aws) {
         this.s3 = new aws.S3();
         this.bucketName = "cab432group100";
     }
 
+    /**
+     * Gets an object from S3.
+     * @param {string} key - The key of the object to get.
+     * @returns {Promise<Object>} - A promise that resolves to the object data.
+     * @throws {Error} - If there was an error getting the object.
+     */
     async getObject (key) {
         const params = {
             Bucket: this.bucketName,
@@ -19,6 +33,12 @@ class S3Utils {
         }
     }
 
+    /**
+     * Gets all objects in a folder in S3.
+     * @param {string} folder - The folder to get objects from.
+     * @returns {Promise<Array<Object>>} - A promise that resolves to an array of objects in the folder.
+     * @throws {Error} - If there was an error getting the objects.
+     */
     async getObjectsInFolder (folder) {
         const params = {
             Bucket: this.bucketName,
@@ -35,6 +55,12 @@ class S3Utils {
     }
     
 
+    /**
+     * Gets a signed URL for an object in S3.
+     * @param {string} key - The key of the object to get a signed URL for.
+     * @returns {Promise<string>} - A promise that resolves to the signed URL.
+     * @throws {Error} - If there was an error getting the signed URL.
+     */
     async getSignedUrl(key) {
         const params = {
             Bucket: this.bucketName,
@@ -51,6 +77,13 @@ class S3Utils {
         }
     }
     
+    /**
+     * Gets a signed URL for uploading an object to S3.
+     * @param {string} key - The key of the object to get a signed URL for.
+     * @param {string} [contentType='video/mp4'] - The content type of the object.
+     * @returns {Promise<string>} - A promise that resolves to the signed URL.
+     * @throws {Error} - If there was an error getting the signed URL.
+     */
     async getSignedUrlForUpload(key, contentType = 'video/mp4') {
         const params = {
             Bucket: this.bucketName,
@@ -69,6 +102,11 @@ class S3Utils {
     }    
 
 
+    /**
+     * Lists all objects in the S3 bucket.
+     * @returns {Promise<Array<Object>>} - A promise that resolves to an array of all objects in the bucket.
+     * @throws {Error} - If there was an error listing the bucket contents.
+     */
     async listBucketContents() {
         const params = {
             Bucket: this.bucketName

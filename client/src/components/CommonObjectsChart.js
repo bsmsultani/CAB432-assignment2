@@ -5,6 +5,13 @@ import {
 
 import './commonObjectsChart.css';
 
+/**
+ * A component that displays a bar chart of the most common objects detected in a video.
+ * @param {Object[]} videoData - An array of objects containing data about the video.
+ * @param {Object[]} videoData.objects - An array of objects detected in the video.
+ * @param {string} videoData.objects.name - The name of the detected object.
+ * @returns {JSX.Element} A React component that displays a bar chart of the most common objects detected in the video.
+ */
 const CommonObjectsChart = ({ videoData }) => {
   const [topNCount, setTopNCount] = useState(10);
 
@@ -28,6 +35,10 @@ const CommonObjectsChart = ({ videoData }) => {
 
   const topN = chartData.slice(0, topNCount);
 
+  /**
+   * Updates the number of top objects to display in the chart.
+   * @param {Object} e - The event object.
+   */
   const handleInputChange = (e) => {
     const value = parseInt(e.target.value, 10);
     setTopNCount(Number.isNaN(value) ? 0 : Math.max(1, value));

@@ -6,12 +6,24 @@ import axios from 'axios';
 
 const apiKey = "AIzaSyDIvVTx_Jrbf3utLtqiXt0zjZf_54ik1sU";
 
+/**
+ * Analyser class for analysing videos by each frame. 
+ */
 class Analyser {
+    /**
+     * Creates an instance of Analyser.
+     * @param {Object} s3 - An instance of the S3 class.
+     */
     constructor(s3) {
         if (!s3) { throw new Error("s3Utils is required"); }
         this.s3 = s3;
     }
 
+    /**
+     * Analyse a video and extract frames from it.
+     * @param {string} videoKey - The key of the video in S3.
+     * @returns {Promise<void>} - A Promise that resolves when the analysis is complete.
+     */
     async analyseVideo(videoKey) {
         const file = await this.s3.getObject(videoKey);
         const videoBuffer = file.Body;
@@ -39,16 +51,18 @@ class Analyser {
 
         const framesJson = JSON.stringify(frames, null, 2);
 
-
-
         console.log("Uploading frames.json to S3");
         await this.s3.uploadObject(`${videoHash}/frames.json`, framesJson);
 
         fs.rmdirSync(tempPathSave, { recursive: true });
-        
-
     }
 
+    /**
+     * Parse frames from a video file.
+     * @param {string} filePath - The path of the video file.
+     * @param {string} framesDir - The directory to save the extracted frames.
+     * @returns {Promise<void>} - A Promise that resolves when the frames are extracted.
+     */
     async __parseFrame(filePath, framesDir) {
         return new Promise((resolve, reject) => {
             ffmpeg()
@@ -67,6 +81,11 @@ class Analyser {
         });
     }
 
+    /**
+     * Analyse frames and detect objects in them.
+     * @param {string} framesDir - The directory containing the frames.
+     * @returns {Promise<Array>} - A Promise that resolves with an array of objects detected in each frame.
+     */
     async __analyseFrames(framesDir) {
         const frames = fs.readdirSync(framesDir);
         const objects = [];
@@ -84,6 +103,11 @@ class Analyser {
         return objects;
     }
 
+    /**
+     * Annotate a frame and detect objects in it.
+     * @param {string} framePath - The path of the frame.
+     * @returns {Promise<Array>} - A Promise that resolves with an array of objects detected in the frame.
+     */
     async __annotateFrame(framePath) {
         const content = fs.readFileSync(framePath);
         try {

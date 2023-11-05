@@ -2,6 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import './videoPreview.css';
 
+/**
+ * A component that displays a video preview with search functionality and a frequency chart.
+ * @param {Object} props - The component props.
+ * @param {string} props.videoPreviewUrl - The URL of the video to preview.
+ * @param {boolean} props.showPreview - Whether to show the video preview or not.
+ * @param {Array} props.videoData - An array of objects containing data about the video frames.
+ * @returns {JSX.Element} - The VideoPreview component.
+ */
 const VideoPreview = ({ videoPreviewUrl, showPreview, videoData }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [searchIndex, setSearchIndex] = useState(0);
@@ -10,6 +18,9 @@ const VideoPreview = ({ videoPreviewUrl, showPreview, videoData }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef(null);
 
+  /**
+   * Updates the frequency data based on the search term.
+   */
   useEffect(() => {
     if (searchTerm) {
       const newFrequencyData = videoData.reduce((acc, data) => {
@@ -26,11 +37,19 @@ const VideoPreview = ({ videoPreviewUrl, showPreview, videoData }) => {
     }
   }, [searchTerm, videoData]);
 
+  /**
+   * Updates the search term when the input value changes.
+   * @param {Object} e - The input change event.
+   */
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
     setSearchIndex(0); // Reset search index on new search term
   };
 
+  /**
+   * Handles the search form submission.
+   * @param {Object} e - The form submission event.
+   */
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     
@@ -50,6 +69,9 @@ const VideoPreview = ({ videoPreviewUrl, showPreview, videoData }) => {
     }
   };
 
+  /**
+   * Updates the current time state when the video time updates.
+   */
   useEffect(() => {
     const videoElement = videoRef.current;
     const handleTimeUpdate = () => {
@@ -63,6 +85,10 @@ const VideoPreview = ({ videoPreviewUrl, showPreview, videoData }) => {
     };
   }, []);
 
+  /**
+   * Handles the click event on the frequency chart.
+   * @param {Object} state - The state of the chart.
+   */
   const handleChartClick = (state) => {
     if (state && state.activeLabel) {
       const clickedTime = state.activeLabel;

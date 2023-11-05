@@ -6,6 +6,11 @@ import './CommonObjectsChart.js';
 import CommonObjectsChart from './CommonObjectsChart.js';
 
 
+/**
+ * A component that allows users to upload a video file and displays a preview of the uploaded video.
+ *
+ * @returns {JSX.Element} The VideoUploadForm component.
+ */
 function VideoUploadForm() {
   const [uploading, setUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState('');

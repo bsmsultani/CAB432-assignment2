@@ -1,16 +1,36 @@
 import Analyser from "./analyser.js"; 
 import S3Utils from "./s3Utils.js";
 
+/**
+ * A utility class for interacting with Amazon Simple Queue Service (SQS).
+ */
 class SqsUtils {
+    /**
+     * Creates an instance of SqsUtils.
+     * Used to interact with Amazon Simple Queue Service (SQS).
+     * @param {Object} aws - The AWS SDK object.
+     */
     constructor(aws) {
+        /**
+         * The SQS object.
+         * @type {Object}
+         */
         this.sqs = new aws.SQS({
             endpoint: "https://sqs.ap-southeast-2.amazonaws.com/901444280953/cab432group109"
         });
 
         const s3Utils = new S3Utils(aws);
+        /**
+         * The Analyser object.
+         * Used to retrieve video information.
+         * @type {Analyser}
+         */
         this.analyser = new Analyser(s3Utils);
     }
 
+    /**
+     * Starts polling the SQS queue for messages.
+     */
     startPolling() {
         console.log("Starting SQS polling...");
 
@@ -66,6 +86,10 @@ class SqsUtils {
         poll();
     }
 
+    /**
+     * Deletes a message from the SQS queue.
+     * @param {string} receiptHandle - The receipt handle of the message to delete.
+     */
     deleteMessage(receiptHandle) {
         const deleteParams = {
             QueueUrl: this.sqs.endpoint.href,
@@ -81,6 +105,11 @@ class SqsUtils {
         });
     }
 
+    /**
+     * Extends the visibility timeout of a message in the SQS queue.
+     * @param {string} receiptHandle - The receipt handle of the message to extend the visibility timeout of.
+     * @param {number} seconds - The number of seconds to extend the visibility timeout by.
+     */
     extendMessageVisibility(receiptHandle, seconds) {
         const params = {
             QueueUrl: this.sqs.endpoint.href,

@@ -9,7 +9,6 @@ import AWS from 'aws-sdk';
 const app = express();
 const port = 3001;
 
-// Connect to EC2 to get this working (cab432group109 is the cluster name)
 
 const redisClient = redis.createClient({
   url: 'redis://cab432group109.km2jzi.ng.0001.apse2.cache.amazonaws.com:6379',
@@ -27,12 +26,10 @@ AWS.config.update({
 
 app.use(cors());
 
-// Parse JSON and URL-encoded bodies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-// Proper middleware function
 app.use((req, res, next) => {
   req.redisClient = redisClient;
   req.AWS = AWS;

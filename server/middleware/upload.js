@@ -1,6 +1,16 @@
 import RedisUtils from '../utils/redisUtils.js';
 import S3Utils from '../utils/s3Utils.js';
 
+/**
+ * Middleware function to handle video upload.
+ * @async
+ * @function upload
+ * @param {Object} req - Express request object.
+ * @param {Object} res - Express response object.
+ * @param {Function} next - Express next middleware function.
+ * @returns {Object} - Returns JSON data if video is already processed, otherwise returns signed url for upload.
+ */
+
 async function upload(req, res, next) {
 
     try {
@@ -16,7 +26,6 @@ async function upload(req, res, next) {
         const redis = new RedisUtils(req.redisClient, video_hash);
         const s3 = new S3Utils(req.AWS);
 
-        // redis.deleteVideoFromProcessed();
 
         if (await redis.isVideoProcessed()) {
             const file = await s3.getObject(`${video_hash}/frames.json`);
