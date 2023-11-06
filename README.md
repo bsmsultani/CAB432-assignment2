@@ -1,6 +1,6 @@
 # CAB432 Cloud Computing Assignment 2
 
-## Getting Started
+Author: **Bismillah Sultani (N11247282) and Mutahher Naseer (N11205342)**
 
 **client folder** contains the client side code for the web application.
 **server folder** contains the server side code for the web application.
