@@ -4,12 +4,9 @@ import requests
 import threading
 import concurrent.futures
 
-# The directory where your .mp4 files are located
-VIDEO_DIR = '/path/to/your/video/folder'
-# The endpoint to which you want to post the video hash
+VIDEO_DIR = './videos'
 UPLOAD_ENDPOINT = 'http://group109lb-1372671419.ap-southeast-2.elb.amazonaws.com/api/video/upload'
 
-# Function to compute the SHA-256 hash of a file
 def compute_hash(file_path):
     sha256_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
@@ -17,18 +14,14 @@ def compute_hash(file_path):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
 
-# Function to upload the video hash and then upload the video file to the returned URL
 def process_and_upload_video(file_path):
-    # Compute the hash of the video
     video_hash = compute_hash(file_path)
-    # Post the hash to the server and get the presigned URL for upload
     response = requests.post(UPLOAD_ENDPOINT, json={'video_hash': video_hash})
 
     if response.status_code == 200:
         data = response.json()
         if 's3Url' in data:
             presigned_url = data['s3Url']
-            # Upload the video to the presigned URL
             with open(file_path, 'rb') as video_file:
                 upload_response = requests.put(presigned_url, data=video_file, headers={'Content-Type': 'video/mp4'})
 
@@ -41,7 +34,6 @@ def process_and_upload_video(file_path):
     else:
         print(f"Failed to get upload URL for {file_path}, Status Code: {response.status_code}")
 
-# Function to list all video files and process them for upload
 def upload_all_videos(directory):
     video_files = [f for f in os.listdir(directory) if f.endswith('.mp4')]
 
